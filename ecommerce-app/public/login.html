@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in &mdash; Fieldstone</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/index.html" class="brand">Field<span>stone</span></a>
+    <nav class="main-nav">
+      <a href="/index.html">Shop</a>
+      <div id="nav-auth"></div>
+      <a href="/cart.html" class="cart-pill">Cart &middot; <span id="nav-cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<div class="form-card">
+  <h1>Log in</h1>
+  <div id="form-alert"></div>
+  <form id="login-form">
+    <div class="field">
+      <label for="username">Username or email</label>
+      <input type="text" id="username" required autofocus>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Log in</button>
+  </form>
+  <p class="form-note">New here? <a href="/register.html" style="text-decoration:underline;">Create an account</a></p>
+</div>
+
+<script src="/js/nav.js"></script>
+<script>
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      document.getElementById('form-alert').innerHTML =
+        `<div class="alert alert-error">${escapeHtml(data.error)}</div>`;
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = params.get('next') || '/index.html';
+  });
+</script>
+</body>
+</html>

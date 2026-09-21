@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fieldstone &mdash; Everyday goods, well made</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/index.html" class="brand">Field<span>stone</span></a>
+    <nav class="main-nav">
+      <a href="/index.html">Shop</a>
+      <div id="nav-auth"></div>
+      <a href="/cart.html" class="cart-pill">Cart &middot; <span id="nav-cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Everyday goods, well made.</h1>
+    <p>A small, honest collection of things for your desk, your home, and your pocket. Browse the shop below.</p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="filter-bar">
+    <input type="text" id="search-input" placeholder="Search products&hellip;">
+    <select id="category-select">
+      <option value="">All categories</option>
+    </select>
+  </div>
+
+  <div id="product-grid" class="product-grid">
+    <!-- product cards injected here -->
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">Fieldstone &mdash; a demo store built for learning purposes.</div>
+</footer>
+
+<script src="/js/nav.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
