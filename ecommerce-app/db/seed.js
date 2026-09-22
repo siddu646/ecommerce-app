@@ -87,28 +87,27 @@ const products = [
 ];
 
 function seed() {
-  db.serialize(() => {
-    // Clear old products completely
-    db.run('DELETE FROM products', (err) => {
-      if (err) console.error('Error clearing products:', err);
-    });
+  try {
+    // Clear existing products
+    db.prepare('DELETE FROM products').run();
 
-    const stmt = db.prepare(
+    // Prepare insert statement
+    const insert = db.prepare(
       'INSERT INTO products (name, price, description, category, image_url) VALUES (?, ?, ?, ?, ?)'
     );
 
-    products.forEach((item) => {
-      stmt.run(item.name, item.price, item.description, item.category, item.image_url);
-    });
-
-    stmt.finalize((err) => {
-      if (err) {
-        console.error('Error seeding database:', err);
-      } else {
-        console.log(`Successfully seeded ${products.length} products across all categories!`);
+    // Run batch insert transaction
+    const insertMany = db.transaction((items) => {
+      for (const item of items) {
+        insert.run(item.name, item.price, item.description, item.category, item.image_url);
       }
     });
-  });
+
+    insertMany(products);
+    console.log(`Successfully seeded ${products.length} products across all categories!`);
+  } catch (err) {
+    console.error('Error seeding database:', err);
+  }
 }
 
 seed();
