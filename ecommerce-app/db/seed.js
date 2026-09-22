@@ -1,89 +1,114 @@
-// db/seed.js
-// Populates the products table with sample data.
-// Run with: npm run seed
-
 const db = require('./database');
 
 const products = [
+  // Groceries
   {
-    name: 'Wireless Headphones',
-    description: 'Over-ear wireless headphones with active noise cancellation and 30-hour battery life.',
-    price: 79.99,
-    image_url: 'https://picsum.photos/seed/headphones/500/500',
-    category: 'Electronics',
-    stock: 25
+    name: 'Organic Whole Coffee Beans',
+    price: 14.99,
+    description: '100% Arabica roasted whole bean coffee.',
+    category: 'Groceries',
+    image_url: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500'
   },
   {
-    name: 'Mechanical Keyboard',
-    description: 'Compact 75% mechanical keyboard with hot-swappable switches and RGB backlighting.',
-    price: 109.0,
-    image_url: 'https://picsum.photos/seed/keyboard/500/500',
-    category: 'Electronics',
-    stock: 15
+    name: 'Extra Virgin Olive Oil',
+    price: 18.50,
+    description: 'Cold-pressed premium olive oil for cooking and dressing.',
+    category: 'Groceries',
+    image_url: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500'
+  },
+
+  // Sports
+  {
+    name: 'Non-Slip Yoga Mat',
+    price: 24.99,
+    description: 'Eco-friendly, extra-thick padded exercise mat.',
+    category: 'Sports',
+    image_url: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500'
   },
   {
-    name: 'Ceramic Coffee Mug',
-    description: 'Hand-glazed 12oz ceramic mug, microwave and dishwasher safe.',
-    price: 14.5,
-    image_url: 'https://picsum.photos/seed/mug/500/500',
-    category: 'Home',
-    stock: 60
-  },
-  {
-    name: 'Canvas Backpack',
-    description: 'Durable water-resistant canvas backpack with padded 15" laptop sleeve.',
+    name: 'Adjustable Dumbbell Set',
     price: 49.99,
-    image_url: 'https://picsum.photos/seed/backpack/500/500',
+    description: 'Compact dumbbell pair suitable for home workout routines.',
+    category: 'Sports',
+    image_url: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=500'
+  },
+
+  // Accessories
+  {
+    name: 'Leather Desk Mat',
+    price: 29.99,
+    description: 'Premium desk pad with anti-slip backing.',
     category: 'Accessories',
-    stock: 30
+    image_url: 'https://images.unsplash.com/photo-1616469829941-c7200edec809?w=500'
   },
   {
-    name: 'Stainless Steel Water Bottle',
-    description: 'Double-walled insulated bottle, keeps drinks cold for 24 hours.',
-    price: 22.0,
-    image_url: 'https://picsum.photos/seed/bottle/500/500',
+    name: 'Minimalist Wrist Watch',
+    price: 89.00,
+    description: 'Classic analog watch with a genuine leather strap.',
     category: 'Accessories',
-    stock: 45
+    image_url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500'
   },
+
+  // Electronics
   {
-    name: 'Desk Lamp',
-    description: 'Adjustable LED desk lamp with 5 brightness levels and USB charging port.',
-    price: 34.99,
-    image_url: 'https://picsum.photos/seed/lamp/500/500',
+    name: 'Wireless Bluetooth Earbuds',
+    price: 59.99,
+    description: 'In-ear headphones with active noise cancellation.',
+    category: 'Electronics',
+    image_url: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500'
+  },
+
+  // Fashion
+  {
+    name: 'Classic White Sneakers',
+    price: 65.00,
+    description: 'Comfortable casual sneakers with breathable fabric.',
+    category: 'Fashion',
+    image_url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500'
+  },
+
+  // Beauty
+  {
+    name: 'Hydrating Eau de Parfum',
+    price: 45.00,
+    description: 'Long-lasting floral fragrance spray.',
+    category: 'Beauty',
+    image_url: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500'
+  },
+
+  // Home
+  {
+    name: 'Modern Accent Armchair',
+    price: 129.99,
+    description: 'Soft cushioned wooden leg armchair for modern living rooms.',
     category: 'Home',
-    stock: 20
-  },
-  {
-    name: 'Running Shoes',
-    description: 'Lightweight breathable running shoes with cushioned sole.',
-    price: 64.99,
-    image_url: 'https://picsum.photos/seed/shoes/500/500',
-    category: 'Apparel',
-    stock: 40
-  },
-  {
-    name: 'Yoga Mat',
-    description: 'Non-slip 6mm thick yoga mat with carrying strap.',
-    price: 27.5,
-    image_url: 'https://picsum.photos/seed/yogamat/500/500',
-    category: 'Fitness',
-    stock: 35
+    image_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500'
   }
 ];
 
-const insert = db.prepare(`
-  INSERT INTO products (name, description, price, image_url, category, stock)
-  VALUES (@name, @description, @price, @image_url, @category, @stock)
-`);
+function seed() {
+  db.serialize(() => {
+    // Clear old products completely
+    db.run('DELETE FROM products', (err) => {
+      if (err) console.error('Error clearing products:', err);
+    });
 
-const existingCount = db.prepare('SELECT COUNT(*) AS c FROM products').get().c;
+    const stmt = db.prepare(
+      'INSERT INTO products (name, price, description, category, image_url) VALUES (?, ?, ?, ?, ?)'
+    );
 
-if (existingCount === 0) {
-  const insertMany = db.transaction((items) => {
-    for (const item of items) insert.run(item);
+    products.forEach((item) => {
+      stmt.run(item.name, item.price, item.description, item.category, item.image_url);
+    });
+
+    stmt.finalize((err) => {
+      if (err) {
+        console.error('Error seeding database:', err);
+      } else {
+        console.log(`Successfully seeded ${products.length} products across all categories!`);
+      }
+    });
   });
-  insertMany(products);
-  console.log(`Seeded ${products.length} products.`);
-} else {
-  console.log(`Products table already has ${existingCount} rows — skipping seed.`);
 }
+
+seed();
